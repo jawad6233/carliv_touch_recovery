@@ -21,9 +21,14 @@
 #include <fs_mgr.h>
 #include <sys/stat.h>
 
-#define MENU_TEXT_COLOR 0, 191, 255, 255
-#define NORMAL_TEXT_COLOR 200, 200, 200, 255
-#define HEADER_TEXT_COLOR 0, 247, 255, 255
+//Struct to return key events to recovery.c through ui_wait_key()
+struct keyStruct{
+	int code;
+	int x;
+	int y;
+	int length;
+	int Xlength;
+};
 
 // Initialize the graphics system.
 void ui_init();
@@ -49,7 +54,6 @@ void ui_printlogtail(int nb_lines);
 void ui_delete_line();
 void ui_set_show_text(int value);
 int ui_get_text_cols();
-void ui_setMenuTextColor(int r, int g, int b, int a);
 
 #ifdef ENABLE_LOKI
 extern int loki_support_enabled;
@@ -73,7 +77,6 @@ int ui_get_selected_item();
 
 int is_ui_initialized();
 void ui_set_showing_back_button(int showBackButton);
-int ui_get_showing_back_button();
 int ui_is_showing_back_button();
 
 void ui_set_log_stdout(int enabled);
@@ -111,15 +114,6 @@ enum {
   MENU_BUTTON_R_LOWHALF,
   MENU_BUTTON_R_HALF,
   NUM_MENU_ICON
-};
-
-//Struct to return key events to recovery.c through ui_wait_key()
-struct keyStruct{
-	unsigned int code;
-	unsigned int x;
-	unsigned int y;
-	unsigned int length;
-	unsigned int Xlength;
 };
 
 void ui_set_background(int icon);

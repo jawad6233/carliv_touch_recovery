@@ -40,29 +40,19 @@
 #include "voldclient/voldclient.h"
 
 #ifndef SYN_REPORT
-#define SYN_REPORT 0x00
+#define SYN_REPORT 			0
 #endif
 #ifndef SYN_CONFIG
-#define SYN_CONFIG 0x01
+#define SYN_CONFIG 			1
 #endif
 #ifndef SYN_MT_REPORT
-#define SYN_MT_REPORT 0x02
+#define SYN_MT_REPORT 		2
 #endif
-#define ABS_MT_POSITION     0x2a 
-#define ABS_MT_AMPLITUDE    0x2b 
-#define ABS_MT_SLOT         0x2f
 #define ABS_MT_TOUCH_MAJOR  0x30
-#define ABS_MT_TOUCH_MINOR  0x31
 #define ABS_MT_WIDTH_MAJOR  0x32
-#define ABS_MT_WIDTH_MINOR  0x33
-#define ABS_MT_ORIENTATION  0x34
 #define ABS_MT_POSITION_X   0x35
 #define ABS_MT_POSITION_Y   0x36
-#define ABS_MT_TOOL_TYPE    0x37
-#define ABS_MT_BLOB_ID      0x38
 #define ABS_MT_TRACKING_ID  0x39
-#define ABS_MT_PRESSURE     0x3a
-#define ABS_MT_DISTANCE     0x3b
 
 
 extern int __system(const char *command);
@@ -82,7 +72,6 @@ static int gShowBackButton = 0;
 #define MENU_ITEM_HEADER_LENGTH strlen(MENU_ITEM_HEADER)
 
 #define MIN_LOG_ROWS 3
-#define MIN_BLANK_ROWS 2
 
 #define CHAR_WIDTH BOARD_RECOVERY_CHAR_WIDTH
 #define CHAR_HEIGHT BOARD_RECOVERY_CHAR_HEIGHT
@@ -122,31 +111,31 @@ static int boardRepeatableKeys[64];
 static int boardNumRepeatableKeys = 0;
 
 static const struct { gr_surface* surface; const char *name; } BITMAPS[] = {
-    { &gBackgroundIcon[BACKGROUND_ICON_INSTALLING], "icon_installing" },
-    { &gBackgroundIcon[BACKGROUND_ICON_ERROR],      "icon_error" },
-    { &gBackgroundIcon[BACKGROUND_ICON_CLOCKWORK],  "icon_clockwork" },
-    { &gBackgroundIcon[BACKGROUND_ICON_FIRMWARE_INSTALLING], "icon_firmware_install" },
-    { &gBackgroundIcon[BACKGROUND_ICON_FIRMWARE_ERROR], "icon_firmware_error" },
-    { &gMenuIcon[MENU_BACK],     	"icon_back" },
-    { &gMenuIcon[MENU_DOWN],     	"icon_down" },
-    { &gMenuIcon[MENU_UP],       	"icon_up" },
-    { &gMenuIcon[MENU_SELECT],   	"icon_select" },
-    { &gMenuIcon[MENU_BACK_M],   	"icon_backM" },
-    { &gMenuIcon[MENU_DOWN_M],   	"icon_downM" },
-    { &gMenuIcon[MENU_UP_M],     	"icon_upM" },
-    { &gMenuIcon[MENU_SELECT_M], 	"icon_selectM" },
-    { &gMenuIcon[MENU_BUTTON_L],    	"button_L" },
-	{ &gMenuIcon[MENU_BUTTON_L_SEL],	"button_L_sel" },
-	{ &gMenuIcon[MENU_BUTTON_R],    	"button_R" },
-	{ &gMenuIcon[MENU_BUTTON_R_SEL],	"button_R_sel" },
-	{ &gMenuIcon[MENU_BUTTON_L_LOWHALF],	"button_L_Lowhalf" },
-	{ &gMenuIcon[MENU_BUTTON_R_LOWHALF],	"button_R_Lowhalf" },
-	{ &gMenuIcon[MENU_BUTTON_R_HALF],	"button_R_half" },
-    { &gProgressBarEmpty,               "progress_empty" },
-    { &gProgressBarFill,                "progress_fill" },
-    { &gVirtualKeys,                    "virtual_keys" },
-    { &gBackground,                "stitch" },
-    { NULL,                             NULL },
+	{ &gBackgroundIcon[BACKGROUND_ICON_INSTALLING],          "icon_installing" },
+	{ &gBackgroundIcon[BACKGROUND_ICON_ERROR],               "icon_error" },
+	{ &gBackgroundIcon[BACKGROUND_ICON_CLOCKWORK],           "icon_clockwork" },
+	{ &gBackgroundIcon[BACKGROUND_ICON_FIRMWARE_INSTALLING], "icon_firmware_install" },
+	{ &gBackgroundIcon[BACKGROUND_ICON_FIRMWARE_ERROR],      "icon_firmware_error" },
+	{ &gMenuIcon[MENU_BACK],     	                         "icon_back" },
+	{ &gMenuIcon[MENU_DOWN],     	                         "icon_down" },
+	{ &gMenuIcon[MENU_UP],       	                         "icon_up" },
+	{ &gMenuIcon[MENU_SELECT],   	                         "icon_select" },
+	{ &gMenuIcon[MENU_BACK_M],   	                         "icon_backM" },
+	{ &gMenuIcon[MENU_DOWN_M],   	                         "icon_downM" },
+	{ &gMenuIcon[MENU_UP_M],     	                         "icon_upM" },
+	{ &gMenuIcon[MENU_SELECT_M], 	                         "icon_selectM" },
+	{ &gMenuIcon[MENU_BUTTON_L],    	                     "button_L" },
+	{ &gMenuIcon[MENU_BUTTON_L_SEL],	                     "button_L_sel" },
+	{ &gMenuIcon[MENU_BUTTON_R],    	                     "button_R" },
+	{ &gMenuIcon[MENU_BUTTON_R_SEL],	                     "button_R_sel" },
+	{ &gMenuIcon[MENU_BUTTON_L_LOWHALF],	                 "button_L_Lowhalf" },
+	{ &gMenuIcon[MENU_BUTTON_R_LOWHALF],	                 "button_R_Lowhalf" },
+	{ &gMenuIcon[MENU_BUTTON_R_HALF],	                     "button_R_half" },
+	{ &gProgressBarEmpty,                                    "progress_empty" },
+	{ &gProgressBarFill,                                     "progress_fill" },
+	{ &gVirtualKeys,                                         "virtual_keys" },
+	{ &gBackground,                                          "stitch" },
+	{ NULL,                                                  NULL },
 };
 
 static int gCurrentIcon = 0;
@@ -170,19 +159,20 @@ static double gProgressScopeDuration;
 // Set to 1 when both graphics pages are the same (except for the progress bar)
 static int gPagesIdentical = 0;
 
+#define MIN_BLANK_ROWS 2
 #define MENU_HEIGHT gr_get_height(gMenuIcon[MENU_BUTTON_L])
-#define MENU_CENTER (gr_get_height(gMenuIcon[MENU_BUTTON_L])/2)
-#define MENU_INCREMENT (gr_get_height(gMenuIcon[MENU_BUTTON_L])/2)
-#define MENU_ITEM_LEFT_OFFSET 0.03*gr_fb_width()
-#define MENU_ITEM_RIGHT_OFFSET 0.52*gr_fb_width()
+#define MENU_CENTER (gr_get_height(gMenuIcon[MENU_BUTTON_L]) / 2)
+#define MENU_INCREMENT (gr_get_height(gMenuIcon[MENU_BUTTON_L]) / 2)
+#define MENU_ITEM_LEFT_OFFSET (0.03 * gr_fb_width())
+#define MENU_ITEM_RIGHT_OFFSET (0.52 * gr_fb_width())
 
 #define resX gr_fb_width()		
 #define resY gr_fb_height()
 
 #define MENU_MAX_HEIGHT gr_get_height(gMenuIcon[MENU_SELECT])	
 
-#define BUTTON_MAX_ROWS (int)(0.8*resY/MENU_INCREMENT)
-#define BUTTON_EQUIVALENT(x) (int)((x*CHAR_HEIGHT)/MENU_INCREMENT)
+#define BUTTON_MAX_ROWS (int)(0.8 * resY / MENU_INCREMENT)
+#define BUTTON_EQUIVALENT(x) (int)((x * CHAR_HEIGHT) / MENU_INCREMENT)
 
 // Log text overlay, displayed when a magic key is pressed
 static char text[MAX_ROWS][MAX_COLS];
@@ -196,7 +186,6 @@ static int show_text_ever = 0; // i.e. has show_text ever been 1?
 
 static char menu[MENU_MAX_ROWS][MENU_MAX_COLS];
 static char submenu[MENU_MAX_ROWS][MENU_MAX_COLS];
-static int menuTextColor[4] = {MENU_TEXT_COLOR};
 static int show_menu = 0;
 static int menu_top = 0;
 static int menu_items = 0;
@@ -232,13 +221,13 @@ static volatile int pt_input_thread_active = 1;
 
 // Struct to store mouse events
 static struct mousePosStruct {
-  unsigned int x;
-  unsigned int y;
-  unsigned int pressure; // 0:up or 255:down
-  unsigned int size;
-  unsigned int num;
-  unsigned int length; // length of the line drawn while in touch state
-  unsigned int Xlength; // length of the line drawn along X axis while in touch state
+  int x;
+  int y;
+  int pressure; // 0:up or 255:down
+  int size;
+  int num;
+  int length; // length of the line drawn while in touch state
+  int Xlength; // length of the line drawn along X axis while in touch state
 } actPos, grabPos, oldMousePos[MAX_MT_POINTS], mousePos[MAX_MT_POINTS], backupPos;
 //Struct to return key events to recovery.c through ui_wait_key()
 volatile struct keyStruct key;
@@ -373,21 +362,100 @@ static void draw_virtualkeys_locked() {
     gr_blit(surface, 0, 0, iconWidth, iconHeight, iconX, iconY);
 }
 
+static int get_batt_stats(void) {
+    int level = -1;
+    char value[4];
+    FILE * fd;
+#ifndef CUSTOM_BATTERY_FILE
+#define CUSTOM_BATTERY_FILE "/sys/class/power_supply/battery/capacity"
+#endif    
+    if ((fd = fopen(CUSTOM_BATTERY_FILE, "rt")) == NULL){
+		LOGI("Error! opening batt file");
+		level = -1;
+		return level;
+	}
+    fgets(value, 4, fd);
+    fclose(fd);
+    level = atoi(value);
+
+    if (level > 100)
+        level = 100;
+    if (level < 0)
+        level = 0;
+    return level;
+}
+
+static int get_batt_charging(void) {
+    int charging = 0;
+    char stat[16] = "";
+    FILE * fs;
+#ifndef CUSTOM_BATTERY_STATS_PATH
+#define CUSTOM_BATTERY_STATS_PATH "/sys/class/power_supply/battery/status"
+#endif
+	if ((fs = fopen(CUSTOM_BATTERY_STATS_PATH, "rt")) == NULL){
+		LOGI("Error! opening batt status file");
+		return charging;
+	}
+	fscanf(fs,"%s",stat);
+	if (strncmp(stat,"Charging", 3) == 0) {
+		charging = 1;
+	}
+    fclose(fs);
+    return charging;
+}
+
+#define LEFT_ALIGN   0
+#define CENTER_ALIGN 1
+#define RIGHT_ALIGN  2
+
+void draw_head_line(int row, const char* t, int align) {
+    int col = 0;
+    if (t[0] != '\0') {
+        int length = strnlen(t, MENU_MAX_COLS) * CHAR_WIDTH;
+        switch(align) {
+            case LEFT_ALIGN:
+                col = 1;
+                break;
+            case CENTER_ALIGN:
+                col = ((gr_fb_width() - length) / 2);
+                break;
+            case RIGHT_ALIGN:
+                col = gr_fb_width() - length - 1;
+                break;
+        }
+        gr_text(col, (row + 1) * CHAR_HEIGHT - 1, t, 0);
+    }
+}
+
 static void draw_text_line(int row, const char* t, int rowOffset, int isMenu, int xOffset) {
   if (t[0] != '\0') {
 	if (ui_get_rainbow_mode()) ui_rainbow_mode(); 
     if (isMenu == 1)
-		gr_text(xOffset, rowOffset + (row+1)*MENU_INCREMENT-1+(MENU_HEIGHT/2), t, 0);
+		gr_text(xOffset, rowOffset + (row + 1) * MENU_INCREMENT - 1 + (MENU_HEIGHT / 2), t, 0);
 	else 
-		gr_text(xOffset, rowOffset + (row+1)*CHAR_HEIGHT-1, t, 0);	
+		gr_text(xOffset, rowOffset + (row + 1) * CHAR_HEIGHT - 1, t, 0);	
   }
 }
 
-void ui_setMenuTextColor(int r, int g, int b, int a) {
-    menuTextColor[0] = r;
-    menuTextColor[1] = g;
-    menuTextColor[2] = b;
-    menuTextColor[3] = a;
+#define MENU_TEXT_COLOR         0, 191, 255, 255
+#define NORMAL_TEXT_COLOR       200, 200, 200, 255
+#define HEADER_TEXT_COLOR       0, 247, 255, 255
+
+static void draw_battery() {
+	int batt_level = 0;
+	int batt_stats = 0;
+	char batt_text[40] = "";	
+    batt_stats = get_batt_charging();
+    batt_level = get_batt_stats();
+    if (batt_stats == 1) {
+		sprintf(batt_text, "[+%d%%]", batt_level);
+	} else {
+		sprintf(batt_text, "[%d%%]", batt_level);
+	}
+	if (batt_level < 21)
+        gr_color(251, 17, 17, 255);
+    else gr_color(40, 176, 40, 255);
+	draw_head_line(0, batt_text, RIGHT_ALIGN);
 }
 
 // Redraw everything on the screen.  Does not flip pages.
@@ -408,7 +476,7 @@ static void draw_screen_locked(void) {
     draw_progress_locked();
 
     if (show_text) {
-		gr_color(0, 0, 0, 140);
+		gr_color(0, 0, 0, 160);
         gr_fill(0, 0, gr_fb_width(), gr_fb_height());
 
         int total_rows = (gr_fb_height() / CHAR_HEIGHT) - MIN_BLANK_ROWS;
@@ -422,10 +490,12 @@ static void draw_screen_locked(void) {
 				draw_icon_locked(gMenuIcon[MENU_DOWN], MENU_ICON[MENU_DOWN].x, MENU_ICON[MENU_DOWN].y);
 				draw_icon_locked(gMenuIcon[MENU_UP], MENU_ICON[MENU_UP].x, MENU_ICON[MENU_UP].y );
 				draw_icon_locked(gMenuIcon[MENU_SELECT], MENU_ICON[MENU_SELECT].x, MENU_ICON[MENU_SELECT].y );
+				
+			draw_battery();
 			
 			gr_color(HEADER_TEXT_COLOR);                   
             for (i = 0; i < menu_top; ++i) {
-                draw_text_line(i, menu[i], rowOffset, !isMenu, 0);
+                draw_head_line(i, menu[i], LEFT_ALIGN);
                 row++;
             }
 
@@ -434,61 +504,61 @@ static void draw_screen_locked(void) {
             else
                 j = menu_items - menu_show_start;
 
-			rowOffset = menu_top*CHAR_HEIGHT+4-MENU_CENTER;
+			rowOffset = menu_top * CHAR_HEIGHT + 4 - MENU_CENTER;
             
-			gr_color(menuTextColor[0], menuTextColor[1], menuTextColor[2], menuTextColor[3]);
+			gr_color(MENU_TEXT_COLOR);
             for (i = menu_show_start + menu_top; i < (menu_show_start + menu_top + j); ++i) {
 				if (i == menu_top + menu_sel) {
-					if ((i - menu_top - menu_show_start)%2 == 0)
+					if ((i - menu_top - menu_show_start) %2 == 0)
 					{
-						draw_icon_locked(gMenuIcon[MENU_BUTTON_L_SEL], resX/2, menu_top*CHAR_HEIGHT + (i - menu_show_start - menu_top + 1)*MENU_INCREMENT);
+						draw_icon_locked(gMenuIcon[MENU_BUTTON_L_SEL], resX / 2, menu_top * CHAR_HEIGHT + (i - menu_show_start - menu_top + 1) * MENU_INCREMENT);
 						gr_color(255, 255, 255, 255);
 						if(menu[i][0] != '-')
-				                    draw_text_line(i - menu_show_start - menu_top , menu[i], rowOffset, isMenu, MENU_ITEM_LEFT_OFFSET);
-				                else
-				                {
-				                    draw_text_line(i - menu_show_start - menu_top , menu[i]+1, rowOffset-CHAR_HEIGHT/2+1, isMenu, MENU_ITEM_LEFT_OFFSET);
-				                    draw_text_line(i - menu_show_start - menu_top , submenu[i], rowOffset+CHAR_HEIGHT/2+1, isMenu, MENU_ITEM_LEFT_OFFSET);
-				                }
+		                    draw_text_line(i - menu_show_start - menu_top , menu[i], rowOffset, isMenu, MENU_ITEM_LEFT_OFFSET);
+		                else
+		                {
+		                    draw_text_line(i - menu_show_start - menu_top , menu[i] + 1, rowOffset - CHAR_HEIGHT / 2 + 1, isMenu, MENU_ITEM_LEFT_OFFSET);
+		                    draw_text_line(i - menu_show_start - menu_top , submenu[i], rowOffset + CHAR_HEIGHT / 2 + 1, isMenu, MENU_ITEM_LEFT_OFFSET);
+		                }
 
 					}
 					else
 					{
-						draw_icon_locked(gMenuIcon[MENU_BUTTON_R_SEL], resX/2, menu_top*CHAR_HEIGHT + (i - menu_show_start - menu_top + 1)*MENU_INCREMENT);
+						draw_icon_locked(gMenuIcon[MENU_BUTTON_R_SEL], resX / 2, menu_top * CHAR_HEIGHT + (i - menu_show_start - menu_top + 1) * MENU_INCREMENT);
 						gr_color(255, 255, 255, 255);
 						if(menu[i][0] != '-')
-				                    draw_text_line(i - menu_show_start - menu_top , menu[i], rowOffset, isMenu, MENU_ITEM_RIGHT_OFFSET);
-				                else
-				                {
-				                    draw_text_line(i - menu_show_start - menu_top , menu[i]+1, rowOffset-CHAR_HEIGHT/2+1, isMenu, MENU_ITEM_RIGHT_OFFSET);
-				                    draw_text_line(i - menu_show_start - menu_top , submenu[i], rowOffset+CHAR_HEIGHT/2+1, isMenu, MENU_ITEM_RIGHT_OFFSET);
-				                }
+		                    draw_text_line(i - menu_show_start - menu_top , menu[i], rowOffset, isMenu, MENU_ITEM_RIGHT_OFFSET);
+		                else
+		                {
+		                    draw_text_line(i - menu_show_start - menu_top , menu[i] + 1, rowOffset - CHAR_HEIGHT / 2 + 1, isMenu, MENU_ITEM_RIGHT_OFFSET);
+		                    draw_text_line(i - menu_show_start - menu_top , submenu[i], rowOffset + CHAR_HEIGHT / 2 + 1, isMenu, MENU_ITEM_RIGHT_OFFSET);
+		                }
 					}
-                    gr_color(menuTextColor[0], menuTextColor[1], menuTextColor[2], menuTextColor[3]);                   
+                    gr_color(MENU_TEXT_COLOR);                   
                 } else {
-					if ((i - menu_top - menu_show_start)%2 == 0)
+					if ((i - menu_top - menu_show_start) %2 == 0)
 					{
-						draw_icon_locked(gMenuIcon[MENU_BUTTON_L], resX/2, menu_top*CHAR_HEIGHT + (i - menu_show_start - menu_top + 1)*MENU_INCREMENT);
-				                gr_color(menuTextColor[0], menuTextColor[1], menuTextColor[2], menuTextColor[3]);
+						draw_icon_locked(gMenuIcon[MENU_BUTTON_L], resX / 2, menu_top * CHAR_HEIGHT + (i - menu_show_start - menu_top + 1)*MENU_INCREMENT);
+		                gr_color(MENU_TEXT_COLOR);
 						if(menu[i][0] != '-')
-				                    draw_text_line(i - menu_show_start - menu_top , menu[i], rowOffset, isMenu, MENU_ITEM_LEFT_OFFSET);
-				                else
-				                {
-				                    draw_text_line(i - menu_show_start - menu_top , menu[i]+1, rowOffset-CHAR_HEIGHT/2+1, isMenu, MENU_ITEM_LEFT_OFFSET);
-				                    draw_text_line(i - menu_show_start - menu_top , submenu[i], rowOffset+CHAR_HEIGHT/2+1, isMenu, MENU_ITEM_LEFT_OFFSET);
-				                }
+		                    draw_text_line(i - menu_show_start - menu_top , menu[i], rowOffset, isMenu, MENU_ITEM_LEFT_OFFSET);
+		                else
+		                {
+		                    draw_text_line(i - menu_show_start - menu_top , menu[i] + 1, rowOffset - CHAR_HEIGHT / 2 + 1, isMenu, MENU_ITEM_LEFT_OFFSET);
+		                    draw_text_line(i - menu_show_start - menu_top , submenu[i], rowOffset + CHAR_HEIGHT / 2 + 1, isMenu, MENU_ITEM_LEFT_OFFSET);
+		                }
 					}
 					else
 					{
-						draw_icon_locked(gMenuIcon[MENU_BUTTON_R], resX/2, menu_top*CHAR_HEIGHT + (i - menu_show_start - menu_top + 1)*MENU_INCREMENT);
-				                gr_color(menuTextColor[0], menuTextColor[1], menuTextColor[2], menuTextColor[3]);
-												if(menu[i][0] != '-')
-				                    draw_text_line(i - menu_show_start - menu_top , menu[i], rowOffset, isMenu, MENU_ITEM_RIGHT_OFFSET);
-				                else
-				                {
-				                    draw_text_line(i - menu_show_start - menu_top , menu[i]+1, rowOffset-CHAR_HEIGHT/2+1, isMenu, MENU_ITEM_RIGHT_OFFSET);
-				                    draw_text_line(i - menu_show_start - menu_top , submenu[i], rowOffset+CHAR_HEIGHT/2+1, isMenu, MENU_ITEM_RIGHT_OFFSET);
-				                }
+						draw_icon_locked(gMenuIcon[MENU_BUTTON_R], resX / 2, menu_top * CHAR_HEIGHT + (i - menu_show_start - menu_top + 1) * MENU_INCREMENT);
+		                gr_color(MENU_TEXT_COLOR);
+						if(menu[i][0] != '-')
+		                    draw_text_line(i - menu_show_start - menu_top , menu[i], rowOffset, isMenu, MENU_ITEM_RIGHT_OFFSET);
+		                else
+		                {
+		                    draw_text_line(i - menu_show_start - menu_top , menu[i] + 1, rowOffset - CHAR_HEIGHT / 2 + 1, isMenu, MENU_ITEM_RIGHT_OFFSET);
+		                    draw_text_line(i - menu_show_start - menu_top , submenu[i], rowOffset + CHAR_HEIGHT / 2 + 1, isMenu, MENU_ITEM_RIGHT_OFFSET);
+		                }
 					}
                 }
                 row++;
@@ -498,24 +568,27 @@ static void draw_screen_locked(void) {
 
             if (menu_items - menu_show_start + BUTTON_EQUIVALENT(menu_top) > BUTTON_MAX_ROWS)
 			{
-				if((BUTTON_MAX_ROWS - BUTTON_EQUIVALENT(menu_top))%2 == 0)
-					draw_icon_locked(gMenuIcon[MENU_BUTTON_L_LOWHALF], resX/2, menu_top*CHAR_HEIGHT + (i - menu_show_start - menu_top + 1)*MENU_INCREMENT - MENU_INCREMENT/2);
+				if((BUTTON_MAX_ROWS - BUTTON_EQUIVALENT(menu_top)) %2 == 0)
+					draw_icon_locked(gMenuIcon[MENU_BUTTON_L_LOWHALF], resX / 2, menu_top * CHAR_HEIGHT + (i - menu_show_start - menu_top + 1) * MENU_INCREMENT - MENU_INCREMENT / 2);
 				else
-					draw_icon_locked(gMenuIcon[MENU_BUTTON_R_LOWHALF], resX/2, menu_top*CHAR_HEIGHT + (i - menu_show_start - menu_top + 1)*MENU_INCREMENT - MENU_INCREMENT/2);
+					draw_icon_locked(gMenuIcon[MENU_BUTTON_R_LOWHALF], resX / 2, menu_top * CHAR_HEIGHT + (i - menu_show_start - menu_top + 1) * MENU_INCREMENT - MENU_INCREMENT / 2);
 			}
 			if (menu_show_start > 0)
 			{
-				draw_icon_locked(gMenuIcon[MENU_BUTTON_R_HALF], resX/2, menu_top*CHAR_HEIGHT + MENU_INCREMENT * 0.5);
-			}       
+				draw_icon_locked(gMenuIcon[MENU_BUTTON_R_HALF], resX / 2, menu_top * CHAR_HEIGHT + MENU_INCREMENT * 0.5);
+			}
+			
+			draw_virtualkeys_locked();
+			       
         }
-        rowOffset = menu_top*CHAR_HEIGHT + (row - menu_top + 2)*MENU_INCREMENT;
+        rowOffset = menu_top * CHAR_HEIGHT + (row - menu_top + 2) * MENU_INCREMENT;
 		if(row == 0)
-			rowOffset=0;
+			rowOffset = 0;
 
         gr_color(NORMAL_TEXT_COLOR);
         int cur_row = text_row;
-        int available_rows = total_rows - (rowOffset/CHAR_HEIGHT) - 1;
-        int start_row = (rowOffset/CHAR_HEIGHT) + 1;
+        int available_rows = total_rows - (rowOffset / CHAR_HEIGHT) - 1;
+        int start_row = (rowOffset / CHAR_HEIGHT) + 1;
         if (available_rows < MAX_ROWS)
             cur_row = (cur_row + (MAX_ROWS - available_rows)) % MAX_ROWS;
         else
@@ -525,10 +598,7 @@ static void draw_screen_locked(void) {
         for (r = 0; r < (available_rows < MAX_ROWS ? available_rows : MAX_ROWS); r++) {
             draw_text_line(start_row + r, text[(cur_row + r) % MAX_ROWS], 0, !isMenu, 0);
         }
-    }
-    
-    if (show_menu)
-        draw_virtualkeys_locked();
+    }       
 }
 
 // Redraw everything on the screen and flip the screen (make it visible).
@@ -611,17 +681,17 @@ static void *progress_thread(void *cookie) {
 // handle the action associated with user input touch events inside the ui handler
 int device_handle_mouse(struct keyStruct *key, int visible)
 {
-	int j=0;
+	int j = 0;
 	if(show_menu && visible)
 	{
-		if((key->code == KEY_SCROLLUP || key->code == KEY_SCROLLDOWN) && (abs(abs(key->length) - abs(key->Xlength)) < 0.2*resY ))
+		if((key->code == KEY_SCROLLUP || key->code == KEY_SCROLLDOWN) && (abs(abs(key->length) - abs(key->Xlength)) < (0.2 * resY)))
 		{
 				if(key->code == KEY_SCROLLDOWN)
 				{
 					selMenuButtonIcon = -1;
 					if (menu_show_start > 0)
 					{
-						menu_show_start = menu_show_start-BUTTON_MAX_ROWS+BUTTON_EQUIVALENT(menu_top);
+						menu_show_start = menu_show_start - BUTTON_MAX_ROWS + BUTTON_EQUIVALENT(menu_top);
 						if (menu_show_start < 0)
 							menu_show_start = 0;
 							selMenuButtonIcon = 0;
@@ -634,47 +704,47 @@ int device_handle_mouse(struct keyStruct *key, int visible)
 				{
 					if (menu_items - menu_show_start + BUTTON_EQUIVALENT(menu_top) > BUTTON_MAX_ROWS)
 					{
-						menu_show_start = menu_show_start+BUTTON_MAX_ROWS-BUTTON_EQUIVALENT(menu_top) -2;
+						menu_show_start = menu_show_start + BUTTON_MAX_ROWS - BUTTON_EQUIVALENT(menu_top) - 2;
 						selMenuButtonIcon = 1;
-						return menu_show_start+1;
+						return menu_show_start + 1;
 					}
 				}
 		}
-		else if ((key->y < (resY - MENU_MAX_HEIGHT)) &&  (key->length < 0.1*resY))
+		else if ((key->y < (resY - MENU_MAX_HEIGHT)) &&  (key->length < (0.1 * resY)))
 		{
 				if (menu_items - menu_show_start + BUTTON_EQUIVALENT(menu_top) > BUTTON_MAX_ROWS)
 					j = BUTTON_MAX_ROWS - BUTTON_EQUIVALENT(menu_top);
 				else
 					j = menu_items - menu_show_start;
 
-				int rowOffset = menu_top*CHAR_HEIGHT;
+				int rowOffset = menu_top * CHAR_HEIGHT;
 
 				int sel_menu;
-				if(key->x < resX/2 && key->y >= rowOffset)
+				if(key->x < resX / 2 && key->y >= rowOffset)
 				{
-					sel_menu = (int)((key->y - rowOffset)/MENU_HEIGHT );
-					sel_menu = sel_menu*2;
+					sel_menu = (int)((key->y - rowOffset) / MENU_HEIGHT );
+					sel_menu = sel_menu * 2;
 				}
-				else if(key->x >= resX/2 && key->y >= (rowOffset + MENU_INCREMENT))
+				else if(key->x >= resX / 2 && key->y >= (rowOffset + MENU_INCREMENT))
 				{
-					sel_menu = (int)((key->y - rowOffset - MENU_INCREMENT)/MENU_HEIGHT );
-					sel_menu = sel_menu*2 + 1;
+					sel_menu = (int)((key->y - rowOffset - MENU_INCREMENT) / MENU_HEIGHT );
+					sel_menu = sel_menu * 2 + 1;
 				}
 				else
 					return -1;
 
-				if(key->y > rowOffset && key->y < rowOffset + (j+1)*MENU_INCREMENT)
+				if(key->y > rowOffset && key->y < (rowOffset + (j + 1) * MENU_INCREMENT))
 				{
 					selMenuButtonIcon = -1;
-					if(sel_menu+menu_show_start < 0)
+					if(sel_menu + menu_show_start < 0)
 						return 0;
 					if (sel_menu == j)
 						return -1;
 
-					return sel_menu+menu_show_start;
+					return sel_menu + menu_show_start;
 			}
 		}
-		else if((key->y > (resY - MENU_MAX_HEIGHT))  &&  (key->length < 0.1*resY))
+		else if((key->y > (resY - MENU_MAX_HEIGHT))  &&  (key->length < (0.1 * resY)))
 		{
 					//ToDo: Following structure should be global
 				struct { int x; int y; int xL; int xR; } MENU_ICON[] = {
@@ -713,32 +783,31 @@ static void ui_handle_mouse_input(int* curPos)
 
   if (show_menu) {
     if (curPos[0] > 0) {
-		int positionX,positionY;
+		int positionX, positionY;
 
 		positionX = curPos[1];
 		positionY = curPos[2];
 
 		pthread_mutex_lock(&gUpdateMutex);
-		struct stat info;
 		if(positionY < (resY - MENU_MAX_HEIGHT)) {
-				int j=0;
+				int j = 0;
 
 				if (menu_items - menu_show_start + BUTTON_EQUIVALENT(menu_top) > BUTTON_MAX_ROWS)
 					j = BUTTON_MAX_ROWS - BUTTON_EQUIVALENT(menu_top);
 				else
 					j = menu_items - menu_show_start;
 
-				int rowOffset = menu_top*CHAR_HEIGHT;
+				int rowOffset = menu_top * CHAR_HEIGHT;
 				int sel_menu;
-				if(positionX < resX/2 && positionY >= rowOffset)
+				if(positionX < resX / 2 && positionY >= rowOffset)
 				{
-					sel_menu = (int)((positionY - rowOffset)/MENU_HEIGHT );
-					sel_menu = sel_menu*2;
+					sel_menu = (int)((positionY - rowOffset) / MENU_HEIGHT );
+					sel_menu = sel_menu * 2;
 				}
-				else if(positionX >= resX/2 && positionY >= (rowOffset + MENU_INCREMENT))
+				else if(positionX >= resX / 2 && positionY >= (rowOffset + MENU_INCREMENT))
 				{
-					sel_menu = (int)((positionY - rowOffset - MENU_INCREMENT)/MENU_HEIGHT );
-					sel_menu = sel_menu*2 + 1;
+					sel_menu = (int)((positionY - rowOffset - MENU_INCREMENT) / MENU_HEIGHT );
+					sel_menu = sel_menu * 2 + 1;
 				}
 				else
 					sel_menu = -1;
@@ -746,55 +815,55 @@ static void ui_handle_mouse_input(int* curPos)
 				if(selMenuButtonIcon < 0)
 					selMenuButtonIcon = 0;
 
-				if(positionY > rowOffset && positionY < rowOffset + (j+1)*MENU_INCREMENT && selMenuButtonIcon != sel_menu && sel_menu != j && sel_menu >= 0)
+				if(positionY > rowOffset && positionY < (rowOffset + (j + 1) * MENU_INCREMENT) && selMenuButtonIcon != sel_menu && sel_menu != j && sel_menu >= 0)
 				{
 					if (sel_menu %2 == 0)
 					{
-						draw_icon_locked(gMenuIcon[MENU_BUTTON_L_SEL], resX/2, menu_top*CHAR_HEIGHT + (sel_menu+1)*MENU_INCREMENT);
+						draw_icon_locked(gMenuIcon[MENU_BUTTON_L_SEL], resX / 2, menu_top * CHAR_HEIGHT + (sel_menu + 1) * MENU_INCREMENT);
 			            gr_color(255, 255, 255, 255);
 						if(menu[sel_menu + menu_show_start + menu_top][0] != '-')
-			                draw_text_line(sel_menu , menu[sel_menu + menu_show_start + menu_top], rowOffset-MENU_CENTER, 1, MENU_ITEM_LEFT_OFFSET);
+			                draw_text_line(sel_menu, menu[sel_menu + menu_show_start + menu_top], rowOffset - MENU_CENTER, 1, MENU_ITEM_LEFT_OFFSET);
 			            else
 			            {
-			                draw_text_line(sel_menu , menu[sel_menu + menu_show_start + menu_top]+1, rowOffset-MENU_CENTER-CHAR_HEIGHT/2+1, 1, MENU_ITEM_LEFT_OFFSET);
-			                draw_text_line(sel_menu , submenu[sel_menu + menu_show_start + menu_top], rowOffset-MENU_CENTER+CHAR_HEIGHT/2+1, 1, MENU_ITEM_LEFT_OFFSET);
+			                draw_text_line(sel_menu, menu[sel_menu + menu_show_start + menu_top] + 1, rowOffset - MENU_CENTER - CHAR_HEIGHT / 2 + 1, 1, MENU_ITEM_LEFT_OFFSET);
+			                draw_text_line(sel_menu, submenu[sel_menu + menu_show_start + menu_top], rowOffset - MENU_CENTER + CHAR_HEIGHT / 2 + 1, 1, MENU_ITEM_LEFT_OFFSET);
 			            }
 					}
 					else
 					{
-						draw_icon_locked(gMenuIcon[MENU_BUTTON_R_SEL], resX/2, menu_top*CHAR_HEIGHT + (sel_menu+1)*MENU_INCREMENT);
+						draw_icon_locked(gMenuIcon[MENU_BUTTON_R_SEL], resX / 2, menu_top * CHAR_HEIGHT + (sel_menu + 1) * MENU_INCREMENT);
 			            gr_color(255, 255, 255, 255);
 						if(menu[sel_menu + menu_show_start + menu_top][0] != '-')
-			                draw_text_line(sel_menu , menu[sel_menu + menu_show_start + menu_top], rowOffset-MENU_CENTER, 1, MENU_ITEM_RIGHT_OFFSET);
+			                draw_text_line(sel_menu, menu[sel_menu + menu_show_start + menu_top], rowOffset - MENU_CENTER, 1, MENU_ITEM_RIGHT_OFFSET);
 			            else
 			            {
-			                draw_text_line(sel_menu , menu[sel_menu + menu_show_start + menu_top]+1, rowOffset-MENU_CENTER-CHAR_HEIGHT/2+1, 1, MENU_ITEM_RIGHT_OFFSET);
-			                draw_text_line(sel_menu , submenu[sel_menu + menu_show_start + menu_top], rowOffset-MENU_CENTER+CHAR_HEIGHT/2+1, 1, MENU_ITEM_RIGHT_OFFSET);
+			                draw_text_line(sel_menu, menu[sel_menu + menu_show_start + menu_top] + 1, rowOffset - MENU_CENTER - CHAR_HEIGHT / 2 + 1, 1, MENU_ITEM_RIGHT_OFFSET);
+			                draw_text_line(sel_menu, submenu[sel_menu + menu_show_start + menu_top], rowOffset - MENU_CENTER + CHAR_HEIGHT / 2 + 1, 1, MENU_ITEM_RIGHT_OFFSET);
 			            }
 					}
 					if (selMenuButtonIcon %2 == 0)
 					{
-						draw_icon_locked(gMenuIcon[MENU_BUTTON_L], resX/2, menu_top*CHAR_HEIGHT + (selMenuButtonIcon+1)*MENU_INCREMENT);
-			            gr_color(menuTextColor[0], menuTextColor[1], menuTextColor[2], menuTextColor[3]);
+						draw_icon_locked(gMenuIcon[MENU_BUTTON_L], resX / 2, menu_top * CHAR_HEIGHT + (selMenuButtonIcon + 1) * MENU_INCREMENT);
+			            gr_color(MENU_TEXT_COLOR);
 						if(menu[selMenuButtonIcon + menu_show_start + menu_top][0] != '-')
-			                draw_text_line(selMenuButtonIcon , menu[selMenuButtonIcon + menu_show_start + menu_top], rowOffset-MENU_CENTER, 1, MENU_ITEM_LEFT_OFFSET);
+			                draw_text_line(selMenuButtonIcon, menu[selMenuButtonIcon + menu_show_start + menu_top], rowOffset - MENU_CENTER, 1, MENU_ITEM_LEFT_OFFSET);
 			            else
 			            {
-			                draw_text_line(selMenuButtonIcon , menu[selMenuButtonIcon + menu_show_start + menu_top]+1, rowOffset-MENU_CENTER-CHAR_HEIGHT/2+1, 1, MENU_ITEM_LEFT_OFFSET);
-			                draw_text_line(selMenuButtonIcon , submenu[selMenuButtonIcon + menu_show_start + menu_top], rowOffset-MENU_CENTER+CHAR_HEIGHT/2+1, 1, MENU_ITEM_LEFT_OFFSET);
+			                draw_text_line(selMenuButtonIcon, menu[selMenuButtonIcon + menu_show_start + menu_top] + 1, rowOffset - MENU_CENTER - CHAR_HEIGHT / 2 + 1, 1, MENU_ITEM_LEFT_OFFSET);
+			                draw_text_line(selMenuButtonIcon, submenu[selMenuButtonIcon + menu_show_start + menu_top], rowOffset - MENU_CENTER + CHAR_HEIGHT / 2 + 1, 1, MENU_ITEM_LEFT_OFFSET);
 			            }
 
 					}
 					else
 					{
-						draw_icon_locked(gMenuIcon[MENU_BUTTON_R], resX/2, menu_top*CHAR_HEIGHT + (selMenuButtonIcon+1)*MENU_INCREMENT);
-			            gr_color(menuTextColor[0], menuTextColor[1], menuTextColor[2], menuTextColor[3]);
+						draw_icon_locked(gMenuIcon[MENU_BUTTON_R], resX / 2, menu_top * CHAR_HEIGHT + (selMenuButtonIcon + 1) * MENU_INCREMENT);
+			            gr_color(MENU_TEXT_COLOR);
 						if(menu[selMenuButtonIcon + menu_show_start + menu_top][0] != '-')
-			                draw_text_line(selMenuButtonIcon , menu[selMenuButtonIcon + menu_show_start + menu_top], rowOffset-MENU_CENTER, 1, MENU_ITEM_RIGHT_OFFSET);
+			                draw_text_line(selMenuButtonIcon, menu[selMenuButtonIcon + menu_show_start + menu_top], rowOffset - MENU_CENTER, 1, MENU_ITEM_RIGHT_OFFSET);
 			            else
 			            {
-			                draw_text_line(selMenuButtonIcon , menu[selMenuButtonIcon + menu_show_start + menu_top]+1, rowOffset-MENU_CENTER-CHAR_HEIGHT/2+1, 1, MENU_ITEM_RIGHT_OFFSET);
-			                draw_text_line(selMenuButtonIcon , submenu[selMenuButtonIcon + menu_show_start + menu_top], rowOffset-MENU_CENTER+CHAR_HEIGHT/2+1, 1, MENU_ITEM_RIGHT_OFFSET);
+			                draw_text_line(selMenuButtonIcon, menu[selMenuButtonIcon + menu_show_start + menu_top] + 1, rowOffset - MENU_CENTER - CHAR_HEIGHT / 2 + 1, 1, MENU_ITEM_RIGHT_OFFSET);
+			                draw_text_line(selMenuButtonIcon, submenu[selMenuButtonIcon + menu_show_start + menu_top], rowOffset - MENU_CENTER + CHAR_HEIGHT / 2 + 1, 1, MENU_ITEM_RIGHT_OFFSET);
 			            }
 
 					}
@@ -836,15 +905,10 @@ static void ui_handle_mouse_input(int* curPos)
   pthread_mutex_unlock(&key_queue_mutex);
 }
 
-static int rel_sum = 0;
-static int rel_sum_x = 0;
-static int rel_sum_y = 0;
-
 static int input_callback(int fd, short revents, void *data) {
     struct input_event ev;
     int ret;
     int fake_key = 0;
-    int got_data = 0;
 
     ret = ev_get_input(fd, revents, &ev);
     if (ret)
@@ -870,24 +934,20 @@ static int input_callback(int fd, short revents, void *data) {
 				actPos.size = 0;
 			}
 	
-			if (actPos.num>=0 && actPos.num<MAX_MT_POINTS) {
-				// create a fake keyboard event. We will use BTN_WHEEL, BTN_GEAR_DOWN and BTN_GEAR_UP key events to fake
-				// TOUCH_MOVE, TOUCH_DOWN and TOUCH_UP in this order
+			if (actPos.num >= 0 && actPos.num < MAX_MT_POINTS) {
 				int type = BTN_WHEEL;
-				// new and old pressure state are not consistent --> we have touch down or up event
-				if ((mousePos[actPos.num].pressure!=0) != (actPos.pressure!=0)) {
+				if ((mousePos[actPos.num].pressure != 0) != (actPos.pressure != 0)) {
 					if (actPos.pressure == 0) {
 						type = BTN_GEAR_UP;
-						if (actPos.num==0) {
-							if (mousePos[0].length<15) {
-								// consider this a mouse click
+						if (actPos.num == 0) {
+							if (mousePos[0].length < 15) {
 								type = BTN_MOUSE;
 							}
-							memset(&grabPos,0,sizeof(grabPos));
+							memset(&grabPos, 0, sizeof(grabPos));
 						}
 					} else if (actPos.pressure != 0) {
 						type == BTN_GEAR_DOWN;
-						if (actPos.num==0) {
+						if (actPos.num == 0) {
 							grabPos = actPos;
 						}
 					}
@@ -896,27 +956,24 @@ static int input_callback(int fd, short revents, void *data) {
 				fake_key = 1;
 				ev.type = EV_KEY;
 				ev.code = type;
-				ev.value = actPos.num+1;
-				
-				// this should be locked, but that causes ui events to get dropped, as the screen drawing takes too much time
-				// this should be solved by making the critical section inside the drawing much much smaller
+				ev.value = actPos.num + 1;
 				if (actPos.pressure) {
                   if (mousePos[actPos.num].pressure) {
-                    actPos.length = mousePos[actPos.num].length + abs(mousePos[actPos.num].x-actPos.x) + abs(mousePos[actPos.num].y-actPos.y);
-					if ( ((mousePos[actPos.num].x-actPos.x) < 0 && mousePos[actPos.num].Xlength > 0) || ((mousePos[actPos.num].x-actPos.x) > 0 && mousePos[actPos.num].Xlength < 0))
+                    actPos.length = mousePos[actPos.num].length + abs(mousePos[actPos.num].x - actPos.x) + abs(mousePos[actPos.num].y - actPos.y);
+					if ( ((mousePos[actPos.num].x - actPos.x) < 0 && mousePos[actPos.num].Xlength > 0) || ((mousePos[actPos.num].x - actPos.x) > 0 && mousePos[actPos.num].Xlength < 0))
 					{
-						actPos.Xlength = mousePos[actPos.num].x-actPos.x;
+						actPos.Xlength = mousePos[actPos.num].x - actPos.x;
 					}
 					else
 					{
-						actPos.Xlength = mousePos[actPos.num].Xlength + mousePos[actPos.num].x-actPos.x;
+						actPos.Xlength = mousePos[actPos.num].Xlength + mousePos[actPos.num].x - actPos.x;
 					}
                   } else {
                     actPos.length = 0;
                     actPos.Xlength = 0;
                   }
                 } else {
-					if (abs(mousePos[actPos.num].Xlength) > (0.1*resX))
+					if (abs(mousePos[actPos.num].Xlength) > (0.1 * resX))
 					{
 						if (mousePos[actPos.num].Xlength > 0)
 						{
@@ -936,12 +993,11 @@ static int input_callback(int fd, short revents, void *data) {
 				ui_handle_mouse_input(curPos);
 			}
 			
-			memset(&actPos,0,sizeof(actPos));
+			memset(&actPos, 0, sizeof(actPos));
 		} else {
 			return 0;
 		}
 	} else if (ev.type == EV_ABS) {
-		  // multitouch records are sent as ABS events. Well at least on the SGS-i9000
 		  if (ev.code == ABS_MT_POSITION_X) {
 		    actPos.x = MT_X(fd, ev.value);
 		  } else if (ev.code == ABS_MT_POSITION_Y) {
@@ -949,61 +1005,16 @@ static int input_callback(int fd, short revents, void *data) {
  		  } else if (ev.code == ABS_MT_TOUCH_MAJOR) {
  		    actPos.pressure = ev.value; 
 		  } else if (ev.code == ABS_MT_PRESSURE) {
-		    actPos.pressure = ev.value; // on normal devices
+		    actPos.pressure = ev.value;
 		  } else if (ev.code == ABS_MT_WIDTH_MAJOR) {
-		    // num is stored inside the high byte of width. Well at least on SGS-i9000
-		    if (actPos.num==0) {
-		      // only update if it was not already set. On a normal device MT_TRACKING_ID is sent
+		    if (actPos.num == 0) {
 		      actPos.num = ev.value >> 8;
 		    }
 		    actPos.size = ev.value & 0xFF;
 		  } else if (ev.code == ABS_MT_TRACKING_ID) {
-		    // on a normal device, the num is got from this value
 		    actPos.num = ev.value;
 		  }
-    } else if (ev.type == EV_REL) {
-        if (ev.code == REL_Y) {
-			// accumulate the up or down motion reported by
-			// the trackball.  When it exceeds a threshol
-			// (positive or negative), fake an up/down
-			// key event.
-			rel_sum_y += ev.value;
-			if (rel_sum_y > 3) { 
-				fake_key = 1;
-				ev.type = EV_KEY;
-				ev.code = KEY_DOWN;
-				ev.value = 1;
-				rel_sum_y = 0;
-            } else if (rel_sum_y < -3) {
-				fake_key = 1;
-				ev.type = EV_KEY;
-				ev.code = KEY_UP;
-				ev.value = 1;
-				rel_sum_y = 0;
-            }
-		}
-		// do the same for the X axis
-		if (ev.code == REL_X) {
-			rel_sum_x += ev.value;
-			if (rel_sum_x > 3) {
-				fake_key = 1;
-				ev.type = EV_KEY;
-				ev.code = KEY_RIGHT;
-				ev.value = 1;
-				rel_sum_x = 0;
-            } else if (rel_sum_x < -3) {
-				fake_key = 1;
-				ev.type = EV_KEY;
-				ev.code = KEY_LEFT;
-				ev.value = 1;
-				rel_sum_x = 0;
-            }
-        }
-    } else {
-        rel_sum = 0;
-        rel_sum_y = 0;
-        rel_sum_x = 0;
-    }
+    } 
 
     if (ev.type != EV_KEY || ev.code > KEY_MAX)
         return 0;
@@ -1021,7 +1032,7 @@ static int input_callback(int fd, short revents, void *data) {
     }
     const int queue_max = sizeof(key_queue) / sizeof(key_queue[0]);
     if (ev.value > 0 && key_queue_len < queue_max) {
-        if (ev.code!=BTN_WHEEL || key_queue_len==0 || key_queue[key_queue_len-1]!=BTN_WHEEL) {
+        if (ev.code != BTN_WHEEL || key_queue_len == 0 || key_queue[key_queue_len - 1] != BTN_WHEEL) {
 			key_queue[key_queue_len++] = ev.code;
 		}
 
@@ -1256,6 +1267,9 @@ void ui_print(const char *fmt, ...) {
     if (ui_log_stdout)
         fputs(buf, stdout);
 
+    if (!ui_has_initialized)
+        return;
+
     // This can get called before ui_init(), so be careful.
     pthread_mutex_lock(&gUpdateMutex);
     if (text_rows > 0 && text_cols > 0) {
@@ -1298,21 +1312,17 @@ void ui_printlogtail(int nb_lines) {
     ui_log_stdout=1;
 }
 
-#define ALLOWED_CHAR (int)(resX*0.47)/CHAR_WIDTH
+#define ALLOWED_CHAR (unsigned int)((resX * 0.47) / CHAR_WIDTH)
+
 int ui_start_menu(const char** headers, char** items, int initial_selection) {
-    int i,j;
-	int remChar;
-	selMenuButtonIcon=0;
+    int i;
+	selMenuButtonIcon = 0;
     pthread_mutex_lock(&gUpdateMutex);
     if (text_rows > 0 && text_cols > 0) {
         for (i = 0; i < text_rows; ++i) {
             if (headers[i] == NULL) break;
-			remChar = (int)(resX - strlen(headers[i])*CHAR_WIDTH)/(CHAR_WIDTH*2);  
-			for (j = 0; j < remChar; j++) {
-				strcpy(menu[i]+j, " ");
-			}
-            strncpy(menu[i]+remChar, headers[i], text_cols- remChar);
-            menu[i][text_cols-remChar] = '\0';
+            strncpy(menu[i], headers[i], text_cols-1);
+            menu[i][text_cols-1] = '\0';
         }
         menu_top = i;
         for (; i < MENU_MAX_ROWS; ++i) {
@@ -1320,20 +1330,20 @@ int ui_start_menu(const char** headers, char** items, int initial_selection) {
             if (strlen(items[i-menu_top]) > ALLOWED_CHAR )	
 			{
 			    strcpy(menu[i], MENU_ITEM_HEADER);
-			    strncpy(menu[i] + MENU_ITEM_HEADER_LENGTH, items[i-menu_top], ALLOWED_CHAR - MENU_ITEM_HEADER_LENGTH);
-			    if(strlen(items[i-menu_top]) > (2*ALLOWED_CHAR - 1) )
+			    strncpy(menu[i] + MENU_ITEM_HEADER_LENGTH, items[i - menu_top], ALLOWED_CHAR - MENU_ITEM_HEADER_LENGTH);
+			    if(strlen(items[i - menu_top]) > (2 * ALLOWED_CHAR - 1) )
 			    {
-				strncpy(submenu[i], items[i-menu_top] + ALLOWED_CHAR - MENU_ITEM_HEADER_LENGTH, ALLOWED_CHAR-3);
-				strcpy(submenu[i] + ALLOWED_CHAR-3, "..." );
+				strncpy(submenu[i], items[i - menu_top] + ALLOWED_CHAR - MENU_ITEM_HEADER_LENGTH, ALLOWED_CHAR - 3);
+				strcpy(submenu[i] + ALLOWED_CHAR - 3, "_" );
 			    }
 			    else
-				strncpy(submenu[i], items[i-menu_top] + ALLOWED_CHAR - MENU_ITEM_HEADER_LENGTH, MENU_MAX_COLS-1 - MENU_ITEM_HEADER_LENGTH);
+				strncpy(submenu[i], items[i - menu_top] + ALLOWED_CHAR - MENU_ITEM_HEADER_LENGTH, MENU_MAX_COLS - 1 - MENU_ITEM_HEADER_LENGTH);
 			}
             else
 			{
-				strncpy(menu[i], items[i-menu_top], MENU_MAX_COLS-1);
+				strncpy(menu[i], items[i - menu_top], MENU_MAX_COLS - 1);
 			}
-	            menu[i][MENU_MAX_COLS-1] = '\0';
+	            menu[i][MENU_MAX_COLS - 1] = '\0';
         }
 
 		gShowBackButton = 0;
@@ -1616,10 +1626,6 @@ void ui_set_show_text(int value) {
 
 void ui_set_showing_back_button(int showBackButton) {
     gShowBackButton = showBackButton;
-}
-
-int ui_get_showing_back_button() {
-    return 1;
 }
 
 int ui_is_showing_back_button() {

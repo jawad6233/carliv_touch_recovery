@@ -127,6 +127,10 @@ extern int device_wipe_cache();
 
 extern int device_wipe_dalvik_cache();
 
+extern int device_wipe_battery_stats();
+
+extern int device_wipe_system();
+
 // Loosely track the depth of the current menu
 extern int ui_root_menu;
 
